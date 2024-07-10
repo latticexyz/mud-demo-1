@@ -1,29 +1,33 @@
 import { useComponentValue } from "@latticexyz/react";
 import { useMUD } from "./MUDContext";
-import { singletonEntity } from "@latticexyz/store-sync/recs";
 
 export const App = () => {
   const {
-    components: { Counter },
-    systemCalls: { increment },
+    components: { Position },
+    systemCalls: { move },
+    network: { playerEntity },
   } = useMUD();
 
-  const counter = useComponentValue(Counter, singletonEntity);
+  const position = useComponentValue(Position, playerEntity);
+
+  if (!position) {
+    return <button onClick={() => move(1, 1)}>Spawn</button>;
+  }
+
+  const { x, y } = position;
 
   return (
     <>
       <div>
-        Counter: <span>{counter?.value ?? "??"}</span>
+        Position:
+        <span>
+          {x}/{y}
+        </span>
       </div>
-      <button
-        type="button"
-        onClick={async (event) => {
-          event.preventDefault();
-          console.log("new counter value:", await increment());
-        }}
-      >
-        Increment
-      </button>
+      <button onClick={() => move(x - 1, y)}>Left</button>
+      <button onClick={() => move(x + 1, y)}>Right</button>
+      <button onClick={() => move(x, y - 1)}>Up</button>
+      <button onClick={() => move(x, y + 1)}>Down</button>
     </>
   );
 };
